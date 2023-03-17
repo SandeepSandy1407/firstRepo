@@ -20,15 +20,28 @@ const initializeDBandServer = async () => {
     process.exit(1);
   }
 };
+initializeDBandServer();
 
 app.get("/players/", async (request, response) => {
+  const convertDbObjectToResponseObject = (dbObject) => {
+    return {
+      playerId: dbObject.player_id,
+      playerName: dbObject.player_name,
+      jerseyNumber: dbObject.jersey_number,
+      role: dbObject.role,
+    };
+  };
   const getPlayerDetails = `
     SELECT
     *
     FROM
     cricket_team;`;
   const playersList = await db.all(getPlayerDetails);
-  response.send(playersList);
+  response.send(
+    playersArray.map((eachPlayer) =>
+      convertDbObjectToResponseObject(eachPlayer)
+    )
+  );
 });
 
 app.post("/players/", async (request, response) => {
