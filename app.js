@@ -36,7 +36,7 @@ app.get("/players/", async (request, response) => {
     *
     FROM
     cricket_team;`;
-  const playersList = await db.all(getPlayerDetails);
+  const playersArray = await db.all(getPlayerDetails);
   response.send(
     playersArray.map((eachPlayer) =>
       convertDbObjectToResponseObject(eachPlayer)
@@ -63,7 +63,14 @@ app.post("/players/", async (request, response) => {
 
 app.get("/players/:playerId/", async (request, response) => {
   const { playerId } = request.params;
-
+  const convertDbObjectToResponseObject = (dbObject) => {
+    return {
+      playerId: dbObject.player_id,
+      playerName: dbObject.player_name,
+      jerseyNumber: dbObject.jersey_number,
+      role: dbObject.role,
+    };
+  };
   const getPlayerDetails = `
     SELECT
     *
@@ -71,8 +78,12 @@ app.get("/players/:playerId/", async (request, response) => {
     cricket_team
     WHERE
     player_id = ${playerId};`;
-  const player = await db.get(getPlayerDetails);
-  response.send(player);
+  const playerArray = await db.get(getPlayerDetails);
+  response.send(
+    playersArray.map((eachPlayer) =>
+      convertDbObjectToResponseObject(eachPlayer)
+    )
+  );
 });
 
 app.put("/players/:playerId/", async (request, response) => {
